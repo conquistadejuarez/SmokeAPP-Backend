@@ -114,66 +114,67 @@ class brandsMethodHandler(tornado.web.RequestHandler):
         self.write(json.dumps(res, indent=4))
         return
 
+
 class singleBrandHandler(tornado.web.RequestHandler):
-    #TO DO:
+    # TO DO:
     pass
 
-class diseasesMethodHandler(tornado.web.RequestHandler):
-    async def post(self):
-        body = json.loads(self.request.body.decode())
+    class diseasesMethodHandler(tornado.web.RequestHandler):
 
-        name = body['name']
-        description = body['description']
-        disease_difficulty = body['disease_difficulty']
+        async def get(self):
+            pass
 
-        res = await api.diseases_init(name, description, disease_difficulty)
+        async def post(self):
+            body = json.loads(self.request.body.decode())
 
-        if 'id_error' in res:
-            self.set_status(400)
+            name = body['name']
+            description = body['description']
+            disease_difficulty = body['disease_difficulty']
+
+            res = await api.diseases_init(name, description, disease_difficulty)
+
+            if 'id_error' in res:
+                self.set_status(400)
+                self.write(json.dumps(res, indent=4))
+                return
+
+            self.set_status(200)
             self.write(json.dumps(res, indent=4))
             return
 
-        self.set_status(200)
-        self.write(json.dumps(res, indent=4))
-        return
+    def make_app():
+        return tornado.web.Application([
+            (r"/api/users/register", RegisterHandler),
+            (r"/api/users/login", LoginHandler),
+            (r"/api/protected", ProtectedMethodHandler),
+            (r"/api/brands", brandsMethodHandler),
+            (r"/api/diseases", diseasesMethodHandler),
+            # (r"/api/brands/(.*)/(.*)", singleBrandHandler)
+        ])
 
+    import tortoise
 
-def make_app():
-    return tornado.web.Application([
-        (r"/api/users/register", RegisterHandler),
-        (r"/api/users/login", LoginHandler),
-        (r"/api/protected", ProtectedMethodHandler),
-        (r"/api/brands", brandsMethodHandler),
-        (r"/api/diseases", diseasesMethodHandler),
-        #(r"/api/brands/(.*)/(.*)", singleBrandHandler)
-    ])
+    async def init_db():
+        current_file_folder = os.path.dirname(os.path.realpath(__file__))
+        with open(f'{current_file_folder}/users_config/config.json', 'rt') as f:
+            c = json.load(f)
 
+        await tortoise.Tortoise.init(
+            db_url=f"postgres://{c['user']}:{c['password']}@{c['host']}/{c['dbname']}",
+            modules={"models": [models]},
+        )
 
-import tortoise
+        await tortoise.Tortoise.generate_schemas()
 
+    if __name__ == "__main__":
+        app = make_app()
 
-async def init_db():
-    current_file_folder = os.path.dirname(os.path.realpath(__file__))
-    with open(f'{current_file_folder}/users_config/config.json', 'rt') as f:
-        c = json.load(f)
+        from tornado.ioloop import IOLoop
 
-    await tortoise.Tortoise.init(
-        db_url=f"postgres://{c['user']}:{c['password']}@{c['host']}/{c['dbname']}",
-        modules={"models": [models]},
-    )
+        loop = IOLoop.current()
 
-    await tortoise.Tortoise.generate_schemas()
+        app.listen(8888)
 
+        loop.run_sync(init_db)
 
-if __name__ == "__main__":
-    app = make_app()
-
-    from tornado.ioloop import IOLoop
-
-    loop = IOLoop.current()
-
-    app.listen(8888)
-
-    loop.run_sync(init_db)
-
-    tornado.ioloop.IOLoop.current().start()
+        tornado.ioloop.IOLoop.current().start()
