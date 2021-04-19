@@ -20,6 +20,8 @@ class test_base(unittest.TestCase):
         self.loop = asyncio.new_event_loop()
         self.a = self.loop.run_until_complete
 
+        c['dbname'] = 'test_'+c['dbname']
+
         initializer(
             modules={"users_models.models": models},
             db_url=f"postgres://{c['user']}:{c['password']}@{c['host']}/{c['dbname']}",
@@ -70,6 +72,8 @@ class test_base_tornado(AsyncHTTPTestCase):
 
         with open(f'{current_file_folder}/../users_config/config.json', 'rt') as f:
             c = json.load(f)
+
+        c['dbname'] = 'test_'+c['dbname']
 
         from tornado.ioloop import IOLoop
 

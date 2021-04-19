@@ -9,6 +9,7 @@ import users_api as api
 import os
 
 from users_models import models
+import users_api.brands as brands_api
 
 
 class RegisterHandler(tornado.web.RequestHandler):
@@ -78,22 +79,50 @@ class ProtectedMethodHandler(tornado.web.RequestHandler):
         return None
 
 
+class singleBrandMethodHandler(tornado.web.RequestHandler):
+
+    async def get(self, id_brand):
+        self.write(json.dumps(await brands_api.get(id_brand)))
+
+
 class brandsMethodHandler(tornado.web.RequestHandler):
+    #
+    # async def get(self):
+    #     with open('brands.csv', 'r') as csv_file:
+    #         csv_reader1 = csv.reader(csv_file)
+    #         for line in csv_reader1:
+    #             if not line:
+    #                 continue
+    #
+    #             c = models.CigarettesBrand(id=line[0], name=line[1], pack_quantity=line[2],
+    #                                        pack_price=line[3], model_strength=line[4])
+    #
+    #             await c.save()
+    #
+    #             self.write(c.name + " " + str(c.pack_price) + " rsd" + "pack quantity: " + str(
+    #                 c.pack_quantity) + "strength: " + str(c.model_strength) + "<br>" + "<hr>")
+    #
+    # async def post(self):
+    #     body = json.loads(self.request.body.decode())
+    #
+    #     name = body['name']
+    #     pack_quantity = body['pack_quantity']
+    #     pack_price = body['pack_price']
+    #     model_strength = body['model_strength']
+    #
+    #     res = await api.brands_init(name, pack_quantity, pack_price, model_strength)
+    #
+    #     if 'id_error' in res:
+    #         self.set_status(400)
+    #         self.write(json.dumps(res, indent=4))
+    #         return
+    #
+    #     self.set_status(200)
+    #     self.write(json.dumps(res, indent=4))
+    #     return
 
     async def get(self):
-        with open('brands.csv', 'r') as csv_file:
-            csv_reader1 = csv.reader(csv_file)
-            for line in csv_reader1:
-                if not line:
-                    continue
-
-                c = models.CigarettesBrand(id=line[0], name=line[1], pack_quantity=line[2],
-                                           pack_price=line[3], model_strength=line[4])
-
-                await c.save()
-
-                self.write(c.name + " " + str(c.pack_price) + " rsd" + "pack quantity: " + str(
-                    c.pack_quantity) + "strength: " + str(c.model_strength) + "<br>" + "<hr>")
+        self.write(json.dumps(await brands_api.get_all()))
 
     async def post(self):
         body = json.loads(self.request.body.decode())
@@ -103,7 +132,7 @@ class brandsMethodHandler(tornado.web.RequestHandler):
         pack_price = body['pack_price']
         model_strength = body['model_strength']
 
-        res = await api.brands_init(name, pack_quantity, pack_price, model_strength)
+        res = await brands_api.add(name, pack_quantity, pack_price, model_strength)
 
         if 'id_error' in res:
             self.set_status(400)
@@ -145,8 +174,8 @@ def make_app():
         (r"/api/users/login", LoginHandler),
         (r"/api/protected", ProtectedMethodHandler),
         (r"/api/brands", brandsMethodHandler),
+        (r"/api/brands/(.*)", singleBrandMethodHandler),
         (r"/api/diseases", diseasesMethodHandler),
-        # (r"/api/brands/(.*)/(.*)", singleBrandHandler)
     ])
 
 
