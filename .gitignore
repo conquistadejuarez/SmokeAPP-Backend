@@ -1,4 +1,6 @@
 .idea/
 .venv/
+*~
+*.pyc
 users_config/config.json
 
