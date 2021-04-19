@@ -1,0 +1,7 @@
+{
+ "user":"__YOUR_USERNAME__",
+ "password":"__YOUR_PASSWORD__",
+ "host":"localhost",
+ "dbname":"mb_users"
+}
+
