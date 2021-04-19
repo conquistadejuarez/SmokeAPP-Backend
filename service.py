@@ -10,6 +10,7 @@ import os
 
 from users_models import models
 import users_api.brands as brands_api
+import users_api.diseases as disease_api
 
 
 class RegisterHandler(tornado.web.RequestHandler):
@@ -147,7 +148,7 @@ class brandsMethodHandler(tornado.web.RequestHandler):
 class diseasesMethodHandler(tornado.web.RequestHandler):
 
     async def get(self):
-        pass
+        self.write(json.dumps(await disease_api.get_all()))
 
     async def post(self):
         body = json.loads(self.request.body.decode())
@@ -202,7 +203,7 @@ if __name__ == "__main__":
 
     loop = IOLoop.current()
 
-    app.listen(8080)
+    app.listen(8888)
 
     loop.run_sync(init_db)
 

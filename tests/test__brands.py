@@ -8,6 +8,7 @@ id_tenant = '00000000-1111-2222-3333-000000000001'
 
 import users_api.brands as brands_api
 
+
 class test_brands_crud(test_base):
 
     def test_add(self):
@@ -20,7 +21,8 @@ class test_brands_crud(test_base):
         r = self.a(brands_api.get(id_brand))
 
     def test_get_all(self):
-
-        self.assertEqual(0,len(self.a(brands_api.get_all())))
+        self.assertEqual(0, len(self.a(brands_api.get_all())))
         self.assertIn('id', self.a(brands_api.add('Marlboro', 20, 200, 10)))
-        self.assertEqual(1,len(self.a(brands_api.get_all())))
+        self.assertEqual(1, len(self.a(brands_api.get_all())))
+        self.a(brands_api.add('Dunhill', 30, 350, 5))
+        self.assertEqual(2, len(self.a(brands_api.get_all())))

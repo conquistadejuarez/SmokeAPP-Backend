@@ -4,3 +4,4 @@ tortoise-orm[accel]
 asynctest
 tornadoweb
 bcrypt
+requests
