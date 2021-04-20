@@ -16,6 +16,8 @@ class User(Model):
     username = fields.CharField(max_length=64)
     password = fields.CharField(max_length=128)
     active = fields.BooleanField(null=False, default=True)
+    average_per_day = fields.IntField(null=False, default=15)
+    #brand_smoking = fields.ForeignKeyField("models.CigarettesBrand", null=False, index=True, related_name='smokers')
 
 
 
@@ -29,6 +31,8 @@ class CigarettesBrand(Model):
     pack_price = fields.IntField()
     model_strength = fields.IntField()
 
+    #smokers: fields.ReverseRelation["User"] = fields.ReverseRelation
+
 
 class Diseases(Model):
     class Meta:
@@ -38,6 +42,8 @@ class Diseases(Model):
     name = fields.CharField(max_length=128, unique=True)
     description = fields.TextField()
     disease_difficulty = fields.IntField()
+    time_to_recover = fields.IntField()
+
 
 class Session(Model):
     class Meta:

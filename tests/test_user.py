@@ -44,10 +44,12 @@ class test_is_valid_password(unittest.TestCase):
         self.assertEqual((False, 'minimum 6 characters is required'), users_api.user_regiter.is_valid_password('pera'))
 
     def test_invalid_non_strong_password_min_1_uppercase(self):
-        self.assertEqual((False, 'minimum 1 uppercase letter is required'), users_api.user_regiter.is_valid_password('peraperic'))
+        self.assertEqual((False, 'minimum 1 uppercase letter is required'),
+                         users_api.user_regiter.is_valid_password('peraperic'))
 
     def test_invalid_non_strong_password_min_1_lowercase(self):
-        self.assertEqual((False, 'minimum 1 lowercase letter is required'), users_api.user_regiter.is_valid_password('PERAPERIC'))
+        self.assertEqual((False, 'minimum 1 lowercase letter is required'),
+                         users_api.user_regiter.is_valid_password('PERAPERIC'))
 
     def test_minimum_1_character_is_required(self):
         self.assertEqual((False, 'minimum 1 character is required'), users_api.user_regiter.is_valid_password('123456'))
@@ -56,10 +58,12 @@ class test_is_valid_password(unittest.TestCase):
         self.assertEqual((False, 'minimum 1 number is required'), users_api.user_regiter.is_valid_password('ABCdefg'))
 
     def test_password_contains_username(self):
-        self.assertEqual((False, 'password should not contains username'), users_api.user_regiter.is_valid_password('Igor123._', 'Igor'))
+        self.assertEqual((False, 'password should not contains username'),
+                         users_api.user_regiter.is_valid_password('Igor123._', 'Igor'))
 
     def test_minimum_1_spec_char_is_required(self):
-        self.assertEqual((False, 'minimum 1 special character !@#$%^&*()_-+=/.,; is required'), users_api.user_regiter.is_valid_password('ABCdefg1'))
+        self.assertEqual((False, 'minimum 1 special character !@#$%^&*()_-+=/.,; is required'),
+                         users_api.user_regiter.is_valid_password('ABCdefg1'))
 
 
 class test_register_user(test_base):
@@ -97,19 +101,18 @@ class test_register_user(test_base):
         self.assertIn('id_error', res)
         self.assertEqual('PASSWORD_TO_WEAK', res['id_error'])
 
+
 class test_login_user(test_base):
 
     def test_login_user_who_dont_exists(self):
-
-        res = self.a(api.login(id_tenant, 'pera',DEFAULT_PASSWORD))
+        res = self.a(api.login(id_tenant, 'pera', DEFAULT_PASSWORD))
         self.assertEqual('ERROR_LOGGING_USER', res['id_error'])
 
     def test_login_user(self):
-
-        res = self.a(api.register(id_tenant, 'zika',DEFAULT_PASSWORD))
+        res = self.a(api.register(id_tenant, 'zika', DEFAULT_PASSWORD))
         self.assertEqual('ok', res['status'])
 
-        res = self.a(api.login(id_tenant, 'zika',DEFAULT_PASSWORD))
+        res = self.a(api.login(id_tenant, 'zika', DEFAULT_PASSWORD))
         self.assertEqual('ok', res['status'])
         self.assertIn('id_user', res)
         self.assertIn('id_session', res)
@@ -119,3 +122,7 @@ class test_login_user(test_base):
 
         res = self.a(api.check(id_session))
         print(res)
+
+    def test_user_register(self):
+        user = self.a(api.register(id_tenant, 'Milos', DEFAULT_PASSWORD))
+        self.assertIn('id_user', user)

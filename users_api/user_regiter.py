@@ -83,7 +83,7 @@ def is_valid_password(password, username=None):
     return False, strength['suggestions'][0]
 
 
-async def register(id_tenant: uuid.UUID, username: str, password: str) -> dict:
+async def register(id_tenant: uuid.UUID, username: str, password: str, average_per_day: int) -> dict:
     username = username.strip().lower()
 
     if not is_valid_username(username):

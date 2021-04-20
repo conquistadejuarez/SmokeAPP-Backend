@@ -20,8 +20,9 @@ class RegisterHandler(tornado.web.RequestHandler):
         id_tenant = body['id_tenant']
         username = body['username']
         password = body['password']
+        average_per_day = body['average_per_day']
 
-        res = await api.register(id_tenant, username, password)
+        res = await api.register(id_tenant, username, password, average_per_day)
 
         if 'id_error' in res:
             self.set_status(400)
@@ -156,8 +157,9 @@ class diseasesMethodHandler(tornado.web.RequestHandler):
         name = body['name']
         description = body['description']
         disease_difficulty = body['disease_difficulty']
+        time_to_recover = body['time_to_recover']
 
-        res = await api.diseases_init(name, description, disease_difficulty)
+        res = await api.diseases_init(name, description, disease_difficulty, time_to_recover)
 
         if 'id_error' in res:
             self.set_status(400)

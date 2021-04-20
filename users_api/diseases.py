@@ -1,9 +1,10 @@
 from users_models import models
 
 
-async def add(name: str, description: str, disease_difficulty: int):
+async def add(name: str, description: str, disease_difficulty: int, time_to_recover: int):
     try:
-        disease = models.Diseases(name=name, description=description, disease_difficulty=disease_difficulty)
+        disease = models.Diseases(name=name, description=description, disease_difficulty=disease_difficulty,
+                                  time_to_recover=time_to_recover)
 
         await disease.save()
     except Exception as e:

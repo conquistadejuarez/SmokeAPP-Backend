@@ -26,14 +26,15 @@ def seed_add_brand(name, pack_price, pack_quantity, model_strength):
     return response
 
 
-def seed_add_disease(name, description, disease_difficulty):
+def seed_add_disease(name, description, disease_difficulty, time_to_recover):
     url = base_url + "/api/diseases"
 
     payload = json.dumps(
         {
             "name": name,
             "description": description,
-            "disease_difficulty": disease_difficulty
+            "disease_difficulty": disease_difficulty,
+            "time_to_recover": time_to_recover,
         })
 
     headers = {
@@ -61,4 +62,4 @@ if __name__ == '__main__':
         for line in csv_reader:
             if not line:
                 continue
-            seed_add_disease(line[1], line[2], int(line[3]))
+            seed_add_disease(line[0], line[1], int(line[2]), int(line[3]))
