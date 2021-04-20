@@ -1,3 +1,5 @@
+#!.venv/bin/python
+
 import csv
 from abc import ABC
 
@@ -20,9 +22,9 @@ class RegisterHandler(tornado.web.RequestHandler):
         id_tenant = body['id_tenant']
         username = body['username']
         password = body['password']
-        average_per_day = body['average_per_day']
+        # average_per_day = body['average_per_day']
 
-        res = await api.register(id_tenant, username, password, average_per_day)
+        res = await api.register(id_tenant, username, password, average_per_day=15)
 
         if 'id_error' in res:
             self.set_status(400)

@@ -17,7 +17,7 @@ class User(Model):
     password = fields.CharField(max_length=128)
     active = fields.BooleanField(null=False, default=True)
     average_per_day = fields.IntField(null=False, default=15)
-    #brand_smoking = fields.ForeignKeyField("models.CigarettesBrand", null=False, index=True, related_name='smokers')
+    brand_smoking = fields.ForeignKeyField("models.CigarettesBrand", null=False, index=True, related_name='smokers')
 
 
 

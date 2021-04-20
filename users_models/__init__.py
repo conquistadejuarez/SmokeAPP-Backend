@@ -1,1 +1,1 @@
-from .models import User, Session
+from .models import User, Session, CigarettesBrand

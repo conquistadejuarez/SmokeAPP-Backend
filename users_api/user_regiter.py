@@ -83,7 +83,7 @@ def is_valid_password(password, username=None):
     return False, strength['suggestions'][0]
 
 
-async def register(id_tenant: uuid.UUID, username: str, password: str, average_per_day: int) -> dict:
+async def register(id_tenant: uuid.UUID, username: str, password: str, id_brand_smoking, average_per_day: int=15) -> dict:
     username = username.strip().lower()
 
     if not is_valid_username(username):
@@ -100,8 +100,13 @@ async def register(id_tenant: uuid.UUID, username: str, password: str, average_p
     if exist:
         return {'status': 'error', 'id_error': 'REGISTER_ERROR', 'message': "can't register user"}
 
+    brand_smoking = await models.CigarettesBrand.filter(id=id_brand_smoking).get_or_none()
+    if not brand_smoking:
+        return {'status': 'error', 'id_error': 'TARGET_BRAND_DONT_EXISTS', 'message': f'target brand id={id_brand_smoking} don\t exsists'}
+
     try:
-        user = models.User(id_tenant=id_tenant, username=username, password=mk_password(username, password))
+        user = models.User(id_tenant=id_tenant, username=username, password=mk_password(username, password), average_per_day=average_per_day, brand_smoking=brand_smoking)
+
         await user.save()
     except Exception as e:
         raise

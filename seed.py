@@ -1,3 +1,5 @@
+#!.venv/bin/python
+import time
 import csv
 import json
 import requests
@@ -47,11 +49,7 @@ def seed_add_disease(name, description, disease_difficulty, time_to_recover):
     return response
 
 
-if __name__ == '__main__':
-
-    #  a = seed_add_brand('marlboro',200,20,10)
-    #  a = seed_add_brand('best',200,20,10)
-
+def do_seed():
     with open('csvFiles/brands.csv', 'r') as csv_file:
         csv_reader1 = csv.reader(csv_file)
         for line in csv_reader1:
@@ -63,3 +61,32 @@ if __name__ == '__main__':
             if not line:
                 continue
             seed_add_disease(line[0], line[1], int(line[2]), int(line[3]))
+
+import os
+
+def kill_service():
+    os.system("""ps aux | grep python | grep service.py | awk '{print "kill -9 "$2}' | bash""")
+
+def create_database():
+    user = 'milos123'
+
+    user = 'igor'		# TODO: procitaj iz ajla
+
+    os.system(f"""echo "drop database mb_users" | psql -U {user} template1""")
+    os.system(f"""echo "create database mb_users" | psql -U {user} template1""")
+
+def start_service():
+    
+    os.system('./service.py &')
+    time.sleep(2)
+
+if __name__ == '__main__':
+
+    kill_service()
+    create_database()
+    start_service()
+    
+    do_seed()
+    kill_service()
+    
+

@@ -69,7 +69,12 @@ class test_is_valid_password(unittest.TestCase):
 class test_register_user(test_base):
 
     def test_register(self):
-        res = self.a(api.register(id_tenant, 'user', DEFAULT_PASSWORD))
+        self.flush_db_at_the_end=False
+        import users_api.brands
+        res = self.a(users_api.brands.add('Marlboro', 20, 200, 10))
+        id_brand = res['id']
+
+        res = self.a(api.register(id_tenant, 'user', DEFAULT_PASSWORD, id_brand_smoking=id_brand))
         self.assertIsNotNone(res)
         self.assertIn('id_user', res)
         self.assertIn('status', res)
