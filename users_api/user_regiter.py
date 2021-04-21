@@ -2,9 +2,9 @@ import re
 import uuid
 import users_models as models
 from tortoise.queryset import Q
-import datetime
+from datetime import datetime, timezone, timedelta
 import bcrypt
-
+import datetime
 
 def is_valid_username(username):
     if len(username) < 2:
@@ -86,7 +86,8 @@ def is_valid_password(password, username=None):
     return False, strength['suggestions'][0]
 
 
-async def register(id_tenant: uuid.UUID, username: str, password: str, id_brand_smoking, average_per_day: int) -> dict:
+async def register(id_tenant: uuid.UUID, username: str, password: str, id_brand_smoking, average_per_day: int,
+                   quit_date: datetime) -> dict:
     username = username.strip().lower()
 
     if not is_valid_username(username):
@@ -110,7 +111,7 @@ async def register(id_tenant: uuid.UUID, username: str, password: str, id_brand_
 
     try:
         user = models.User(id_tenant=id_tenant, username=username, password=mk_password(username, password),
-                           average_per_day=average_per_day, brand_smoking=brand_smoking)
+                           average_per_day=average_per_day, brand_smoking=brand_smoking, quit_date=quit_date)
 
         await user.save()
     except Exception as e:

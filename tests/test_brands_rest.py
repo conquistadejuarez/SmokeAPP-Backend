@@ -3,7 +3,7 @@ import json
 from unittest.mock import patch
 from tests.helper import test_base_tornado, TestingHelper
 from tornado.httpclient import AsyncHTTPClient
-
+from datetime import datetime, timedelta
 from tests.test_rest import ID_TENANT
 import uuid
 
@@ -20,7 +20,8 @@ class TestBrandsRest(TestingHelper):
                      'username': 'user',
                      'password': '123ABCa.',
                      'brand_smoking': self.id_brand,
-                     'average_per_day': 15
+                     'average_per_day': 15,
+                     'quit_date': str(datetime.today() - timedelta(5))
                  })
 
         print(self.last_code)

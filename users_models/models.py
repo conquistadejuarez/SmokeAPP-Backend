@@ -1,9 +1,13 @@
 import uuid
 import tortoise
-from tortoise import Tortoise, fields
+from tortoise import Tortoise, fields, timezone
 from tortoise.models import Model
 import json
 import datetime
+
+
+def tz_now():
+    return tortoise.timezone.now()
 
 
 class User(Model):
@@ -18,7 +22,30 @@ class User(Model):
     active = fields.BooleanField(null=False, default=True)
     average_per_day = fields.IntField(null=False)
     brand_smoking = fields.ForeignKeyField("models.CigarettesBrand", null=False, index=True, related_name='smokers')
+    quit_date = fields.DatetimeField(null=True)
 
+    def __str__(self):
+        return 'Welcome back, ' + self.username
+
+    @property
+    def days_since_user_quits(self):
+        diff = tz_now() - self.quit_date
+        return diff.days
+
+    async def calc_money_spend_per_day(self):
+        await self.fetch_related('brand_smoking')
+
+        one_cigarette = self.brand_smoking.pack_price / self.brand_smoking.pack_quantity
+        spending_per_day = self.average_per_day * one_cigarette
+        return spending_per_day
+
+    async def calc_money_not_spend(self):
+        money = self.days_since_user_quits * await self.calc_money_spend_per_day()
+        return money
+
+    def calc_cigarettes_user_did_not_smoke(self):
+        cigarettes = self.days_since_user_quits * self.average_per_day
+        return cigarettes
 
 
 class CigarettesBrand(Model):
@@ -31,7 +58,7 @@ class CigarettesBrand(Model):
     pack_price = fields.IntField()
     model_strength = fields.IntField()
 
-    #smokers: fields.ReverseRelation["User"] = fields.ReverseRelation
+    # smokers: fields.ReverseRelation["User"] = fields.ReverseRelation
 
 
 class Diseases(Model):

@@ -1,8 +1,12 @@
 import unittest
 import json
+
+from requests import api
+from users_api import today
 from tests.helper import test_base_tornado, TestingHelper
 
 from tornado.httpclient import AsyncHTTPClient
+from datetime import datetime, timedelta
 
 ID_TENANT = '8007dc9c-3e4d-450c-9f2c-18f312b21bdb'
 import uuid
@@ -12,7 +16,7 @@ class TestUser(TestingHelper):
 
     def setUp(self):
         super().setUp()
-        self.add_brand('Marlboro',20,200,10)
+        self.add_brand('Marlboro', 20, 200, 10)
         id_brand = self.last_result['id']
 
         self.api(None, 'POST', '/api/users/register',
@@ -21,7 +25,8 @@ class TestUser(TestingHelper):
                      'username': 'user',
                      'password': '123ABCa.',
                      'brand_smoking': id_brand,
-                     'average_per_day': 15
+                     'average_per_day': 15,
+                     'quit_date': str(datetime.today())
                  })
 
         self.assertEqual(200, self.last_code)
@@ -68,7 +73,7 @@ class TestUser(TestingHelper):
 
 class TestRegistarUser(TestingHelper):
     def test_register_user(self):
-        self.add_brand('Marlboro',20,200,10)
+        self.add_brand('Marlboro', 20, 200, 10)
 
         id_brand = self.last_result['id']
         self.api(None, 'POST', '/api/users/register',
@@ -77,7 +82,8 @@ class TestRegistarUser(TestingHelper):
                      'username': 'user',
                      'password': '123ABCa.',
                      'brand_smoking': id_brand,
-                     'average_per_day': 15
+                     'average_per_day': 15,
+                     'quit_date': str(datetime.today() - timedelta(5))
                  })
         self.assertEqual(200, self.last_code)
 

@@ -4,14 +4,16 @@ import asyncio
 import json
 import os
 from tornado.testing import AsyncHTTPTestCase
-
+from datetime import datetime
 from users_models import models, User
 
 current_file_folder = os.path.dirname(os.path.realpath(__file__))
 
+def today():
+    return datetime.today()
+
 class test_base(unittest.TestCase):
     def setUp(self):
-
         super().setUp()
 
         with open(f'{current_file_folder}/../users_config/config.json', 'rt') as f:
@@ -20,7 +22,7 @@ class test_base(unittest.TestCase):
         self.loop = asyncio.new_event_loop()
         self.a = self.loop.run_until_complete
 
-        c['dbname'] = 'test_'+c['dbname']
+        c['dbname'] = 'test_' + c['dbname']
 
         initializer(
             modules={"users_models.models": models},
@@ -53,7 +55,6 @@ class test_base_tornado(AsyncHTTPTestCase):
         self.last_code = 0
         self.last_result = {}
 
-
         headers = {}
         if token:
             headers['Authorization'] = token
@@ -68,7 +69,6 @@ class test_base_tornado(AsyncHTTPTestCase):
 
         return res.code
 
-
     def setUp(self):
 
         super().setUp()
@@ -76,7 +76,7 @@ class test_base_tornado(AsyncHTTPTestCase):
         with open(f'{current_file_folder}/../users_config/config.json', 'rt') as f:
             c = json.load(f)
 
-        c['dbname'] = 'test_'+c['dbname']
+        c['dbname'] = 'test_' + c['dbname']
 
         from tornado.ioloop import IOLoop
 
