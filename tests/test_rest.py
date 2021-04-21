@@ -1,6 +1,6 @@
 import unittest
 import json
-from tests.helper import test_base_tornado
+from tests.helper import test_base_tornado, TestingHelper
 
 from tornado.httpclient import AsyncHTTPClient
 
@@ -8,26 +8,27 @@ ID_TENANT = '8007dc9c-3e4d-450c-9f2c-18f312b21bdb'
 import uuid
 
 
-class TestUser(test_base_tornado):
+class TestUser(TestingHelper):
 
     def setUp(self):
         super().setUp()
+        self.add_brand('Marlboro',20,200,10)
+        id_brand = self.last_result['id']
+
         self.api(None, 'POST', '/api/users/register',
                  body={
                      'id_tenant': ID_TENANT,
                      'username': 'user',
                      'password': '123ABCa.',
-                     'id_brand_smoking':id_brand,
+                     'brand_smoking': id_brand,
                      'average_per_day': 15
                  })
 
         self.assertEqual(200, self.last_code)
         self.id_session = self.last_result['id_session']
 
-    def test_one(self):
-        self.assertTrue(True)
-
     def test_login_user(self):
+        # self.flush_db_at_the_end = False
         self.api(None, 'POST', '/api/users/login',
                  body={
                      'id_tenant': ID_TENANT,
@@ -45,6 +46,7 @@ class TestUser(test_base_tornado):
                      'username': 'user',
                      'password': '123ABCa!'}
                  )
+
         self.assertEqual(400, self.last_code)
 
     def test_protected_api_call(self):
@@ -64,16 +66,9 @@ class TestUser(test_base_tornado):
         # print(self.last_result)
 
 
-class TestRegistarUser(test_base_tornado):
+class TestRegistarUser(TestingHelper):
     def test_register_user(self):
-        # import users_api.brands
-        # res = self.a(users_api.brands.add('Marlboro', 20, 200, 10))
-        self.api(None, "POST", '/api/brands', body={
-            'name': 'Marlboro',
-            'pack_quantity': 20,
-            'pack_price': 200,
-            'model_strength': 10
-        })
+        self.add_brand('Marlboro',20,200,10)
 
         id_brand = self.last_result['id']
         self.api(None, 'POST', '/api/users/register',

@@ -58,7 +58,7 @@ class test_base_tornado(AsyncHTTPTestCase):
         if token:
             headers['Authorization'] = token
 
-        res = self.fetch(url, method=method, body=body, headers=headers, request_timeout=300)
+        res = self.fetch(url, method=method, body=body, headers=headers, request_timeout=3600)
 
         self.last_code = res.code
         try:
@@ -92,3 +92,15 @@ class test_base_tornado(AsyncHTTPTestCase):
         _flush_db = not hasattr(self, 'flush_db_at_the_end') or self.flush_db_at_the_end
         if _flush_db:
             finalizer()
+
+
+class TestingHelper(test_base_tornado):
+
+    def add_brand(self, name, pack_quantity, pack_price, model_strength):
+        self.api(None, 'POST', '/api/brands',
+                 body={
+                     'name': name,
+                     'pack_quantity': pack_quantity,
+                     'pack_price': pack_price,
+                     'model_strength': model_strength})
+        return self.last_result
