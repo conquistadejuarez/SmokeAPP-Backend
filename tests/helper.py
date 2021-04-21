@@ -5,7 +5,7 @@ import json
 import os
 from tornado.testing import AsyncHTTPTestCase
 
-from users_models import models
+from users_models import models, User
 
 current_file_folder = os.path.dirname(os.path.realpath(__file__))
 
@@ -44,6 +44,8 @@ class test_base_tornado(AsyncHTTPTestCase):
         return service.make_app()
 
     def api(self, token, method, url, body={}):
+        if body is None:
+            body = {}
         body = json.dumps(body)
         if method in ('GET', 'DELETE'):
             body = None
@@ -51,11 +53,12 @@ class test_base_tornado(AsyncHTTPTestCase):
         self.last_code = 0
         self.last_result = {}
 
+
         headers = {}
         if token:
             headers['Authorization'] = token
 
-        res = self.fetch(url, method=method, body=body, headers=headers)
+        res = self.fetch(url, method=method, body=body, headers=headers, request_timeout=300)
 
         self.last_code = res.code
         try:

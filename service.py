@@ -1,7 +1,5 @@
 #!.venv/bin/python
 
-import csv
-from abc import ABC
 
 import tornado.ioloop
 import tornado.web
@@ -22,9 +20,10 @@ class RegisterHandler(tornado.web.RequestHandler):
         id_tenant = body['id_tenant']
         username = body['username']
         password = body['password']
-        # average_per_day = body['average_per_day']
+        average_per_day = body['average_per_day'] if 'average_per_day' in body else None
+        id_brand_smoking = body['brand_smoking'] if 'brand_smoking' in body else None
 
-        res = await api.register(id_tenant, username, password, average_per_day=15)
+        res = await api.register(id_tenant, username, password,id_brand_smoking ,average_per_day)
 
         if 'id_error' in res:
             self.set_status(400)

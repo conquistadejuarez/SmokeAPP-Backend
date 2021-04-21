@@ -69,14 +69,14 @@ def kill_service():
 
 def create_database():
     user = 'milos123'
+    # TODO: procitaj iz ajla
 
-    user = 'igor'		# TODO: procitaj iz ajla
 
     os.system(f"""echo "drop database mb_users" | psql -U {user} template1""")
     os.system(f"""echo "create database mb_users" | psql -U {user} template1""")
 
 def start_service():
-    
+
     os.system('./service.py &')
     time.sleep(2)
 
@@ -85,8 +85,8 @@ if __name__ == '__main__':
     kill_service()
     create_database()
     start_service()
-    
+
     do_seed()
     kill_service()
-    
+
 

@@ -65,15 +65,18 @@ def password_strength(password, username=None):
 
 
 def format_password(username, password):
-    return  f'{username}:{password}'.encode()
+    return f'{username}:{password}'.encode()
+
 
 def mk_password(username, password):
     salt = bcrypt.gensalt()
     hashed = bcrypt.hashpw(format_password(username, password), salt)
     return hashed.decode()
 
+
 def check_password(username, password, hashed_password):
     return bcrypt.checkpw(format_password(username, password), hashed_password.encode()) == True
+
 
 def is_valid_password(password, username=None):
     strength = password_strength(password, username)
@@ -83,7 +86,7 @@ def is_valid_password(password, username=None):
     return False, strength['suggestions'][0]
 
 
-async def register(id_tenant: uuid.UUID, username: str, password: str, id_brand_smoking, average_per_day: int=15) -> dict:
+async def register(id_tenant: uuid.UUID, username: str, password: str, id_brand_smoking, average_per_day: int) -> dict:
     username = username.strip().lower()
 
     if not is_valid_username(username):
@@ -102,10 +105,12 @@ async def register(id_tenant: uuid.UUID, username: str, password: str, id_brand_
 
     brand_smoking = await models.CigarettesBrand.filter(id=id_brand_smoking).get_or_none()
     if not brand_smoking:
-        return {'status': 'error', 'id_error': 'TARGET_BRAND_DONT_EXISTS', 'message': f'target brand id={id_brand_smoking} don\t exsists'}
+        return {'status': 'error', 'id_error': 'TARGET_BRAND_DONT_EXISTS',
+                'message': f'target brand id={id_brand_smoking} don\t exsists'}
 
     try:
-        user = models.User(id_tenant=id_tenant, username=username, password=mk_password(username, password), average_per_day=average_per_day, brand_smoking=brand_smoking)
+        user = models.User(id_tenant=id_tenant, username=username, password=mk_password(username, password),
+                           average_per_day=average_per_day, brand_smoking=brand_smoking)
 
         await user.save()
     except Exception as e:
@@ -114,7 +119,8 @@ async def register(id_tenant: uuid.UUID, username: str, password: str, id_brand_
     login_user = await login(id_tenant, username, password)
 
     if login_user and 'status' in login_user and login_user['status'] == 'ok':
-        return {'status': 'ok', 'id_user': str(user.id), 'id_session': login_user['id_session'], 'expires_on': login_user['expires_on']}
+        return {'status': 'ok', 'id_user': str(user.id), 'id_session': login_user['id_session'],
+                'expires_on': login_user['expires_on']}
 
     return login_user
 
@@ -131,8 +137,8 @@ async def login(id_tenant: uuid.UUID, username: str, password: str) -> dict:
 
     try:
         if not check_password(username, password, user.password):
-
-            return {'status': 'error', 'id_error': 'ERROR_LOGGING_USER', 'message': "invalid username/password combination"}
+            return {'status': 'error', 'id_error': 'ERROR_LOGGING_USER',
+                    'message': "invalid username/password combination"}
     except Exception as e:
         raise
 
@@ -151,12 +157,14 @@ async def check(id_session: uuid.UUID):
     session = await models.Session.filter(id=id_session).get_or_none()
 
     if not session:
-        return {'status': 'error', 'id_message': 'SESSION_NOT_FOUND_OR_EXPIRED', 'message': 'Session not found or expired'}
+        return {'status': 'error', 'id_message': 'SESSION_NOT_FOUND_OR_EXPIRED',
+                'message': 'Session not found or expired'}
 
     import tortoise.timezone
 
     if session.expires_datetime < tortoise.timezone.make_aware(datetime.datetime.now()):
-        return {'status': 'error', 'id_message': 'SESSION_NOT_FOUND_OR_EXPIRED', 'message': 'Session not found or expired'}
+        return {'status': 'error', 'id_message': 'SESSION_NOT_FOUND_OR_EXPIRED',
+                'message': 'Session not found or expired'}
 
     return {'status': 'ok',
             'id_user': str(session.user_id)}

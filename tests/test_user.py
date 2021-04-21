@@ -1,7 +1,7 @@
 from tests.helper import test_base
 import users_api as api
 import unittest
-
+import users_api.brands
 import users_api.user_regiter
 
 id_tenant = '00000000-1111-2222-3333-000000000001'
@@ -69,25 +69,28 @@ class test_is_valid_password(unittest.TestCase):
 class test_register_user(test_base):
 
     def test_register(self):
-        self.flush_db_at_the_end=False
-        import users_api.brands
+        #self.flush_db_at_the_end=False
         res = self.a(users_api.brands.add('Marlboro', 20, 200, 10))
         id_brand = res['id']
 
-        res = self.a(api.register(id_tenant, 'user', DEFAULT_PASSWORD, id_brand_smoking=id_brand))
+        res = self.a(api.register(id_tenant, 'user', DEFAULT_PASSWORD, id_brand_smoking=id_brand, average_per_day=15))
         self.assertIsNotNone(res)
         self.assertIn('id_user', res)
         self.assertIn('status', res)
         self.assertEqual('ok', res['status'])
 
+        #self.flush_db_at_the_end = False
     def test_try_register_user_with_existing_username_on_same_tenant(self):
-        res = self.a(api.register(id_tenant, 'user', DEFAULT_PASSWORD))
+        res = self.a(api.brands.add('Marlboro',20,200,10))
+        id_brand = res['id']
+
+        res = self.a(api.register(id_tenant, 'user', DEFAULT_PASSWORD, id_brand_smoking=id_brand, average_per_day=15))
         self.assertIsNotNone(res)
         self.assertIn('status', res)
         self.assertIn('id_user', res)
         self.assertEqual('ok', res['status'])
 
-        res = self.a(api.register(id_tenant, 'user', DEFAULT_PASSWORD))
+        res = self.a(api.register(id_tenant, 'user', DEFAULT_PASSWORD, id_brand_smoking=id_brand, average_per_day=15))
         self.assertNotIn('id', res)
         self.assertIn('id_error', res)
         self.assertIn('status', res)
@@ -95,14 +98,19 @@ class test_register_user(test_base):
         self.assertEqual('REGISTER_ERROR', res['id_error'])
 
     def test_try_to_register_user_with_invalid_username(self):
-        res = self.a(api.register(id_tenant, 'pera+zika', DEFAULT_PASSWORD))
+        res = self.a(api.brands.add('Marlboro', 20, 200, 10))
+        id_brand = res['id']
+
+        res = self.a(api.register(id_tenant, 'pera+zika', DEFAULT_PASSWORD, id_brand_smoking=id_brand, average_per_day=15))
         self.assertEqual({'status': 'error', 'message': 'invalid username', 'id_error': 'REGISTER_ERROR'}, res)
 
-        res = self.a(api.register(id_tenant, 'p', DEFAULT_PASSWORD))
+        res = self.a(api.register(id_tenant, 'p', DEFAULT_PASSWORD, id_brand_smoking=id_brand, average_per_day=15))
         self.assertEqual({'status': 'error', 'id_error': 'REGISTER_ERROR', 'message': 'invalid username'}, res)
 
     def test_try_to_register_user_with_simple_password(self):
-        res = self.a(api.register(id_tenant, 'user', 'user123'))
+        res = self.a(api.brands.add('Marlboro', 20, 200, 10))
+        id_brand = res['id']
+        res = self.a(api.register(id_tenant, 'user', 'user123', id_brand_smoking=id_brand, average_per_day=15))
         self.assertIn('id_error', res)
         self.assertEqual('PASSWORD_TO_WEAK', res['id_error'])
 
@@ -110,11 +118,15 @@ class test_register_user(test_base):
 class test_login_user(test_base):
 
     def test_login_user_who_dont_exists(self):
+        res = self.a(api.brands.add('Marlboro', 20, 200, 10))
+        id_brand = res['id']
         res = self.a(api.login(id_tenant, 'pera', DEFAULT_PASSWORD))
         self.assertEqual('ERROR_LOGGING_USER', res['id_error'])
 
     def test_login_user(self):
-        res = self.a(api.register(id_tenant, 'zika', DEFAULT_PASSWORD))
+        res = self.a(api.brands.add('Marlboro', 20, 200, 10))
+        id_brand = res['id']
+        res = self.a(api.register(id_tenant, 'zika', DEFAULT_PASSWORD, id_brand_smoking=id_brand, average_per_day=15))
         self.assertEqual('ok', res['status'])
 
         res = self.a(api.login(id_tenant, 'zika', DEFAULT_PASSWORD))
@@ -129,5 +141,7 @@ class test_login_user(test_base):
         print(res)
 
     def test_user_register(self):
-        user = self.a(api.register(id_tenant, 'Milos', DEFAULT_PASSWORD))
+        res = self.a(api.brands.add('Marlboro', 20, 200, 10))
+        id_brand = res['id']
+        user = self.a(api.register(id_tenant, 'Milos', DEFAULT_PASSWORD, id_brand_smoking=id_brand, average_per_day=15))
         self.assertIn('id_user', user)

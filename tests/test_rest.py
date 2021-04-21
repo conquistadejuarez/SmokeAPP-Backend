@@ -16,18 +16,24 @@ class TestUser(test_base_tornado):
                  body={
                      'id_tenant': ID_TENANT,
                      'username': 'user',
-                     'password': '123ABCa.'})
+                     'password': '123ABCa.',
+                     'id_brand_smoking':id_brand,
+                     'average_per_day': 15
+                 })
 
         self.assertEqual(200, self.last_code)
         self.id_session = self.last_result['id_session']
+
+    def test_one(self):
+        self.assertTrue(True)
 
     def test_login_user(self):
         self.api(None, 'POST', '/api/users/login',
                  body={
                      'id_tenant': ID_TENANT,
                      'username': 'user',
-                     'password': '123ABCa.'}
-                 )
+                     'password': '123ABCa.',
+                 })
         self.assertEqual(200, self.last_code)
         self.assertTrue('status' in self.last_result and 'ok' in self.last_result['status'])
         self.assertTrue('id_session' in self.last_result)
@@ -42,7 +48,6 @@ class TestUser(test_base_tornado):
         self.assertEqual(400, self.last_code)
 
     def test_protected_api_call(self):
-
         self.api(self.id_session, "GET", '/api/protected')
         self.assertTrue(200, self.last_code)
         print(self.last_result)
@@ -58,15 +63,27 @@ class TestUser(test_base_tornado):
         # print(self.last_code)
         # print(self.last_result)
 
-class TestRegistarUser(test_base_tornado):
 
+class TestRegistarUser(test_base_tornado):
     def test_register_user(self):
+        # import users_api.brands
+        # res = self.a(users_api.brands.add('Marlboro', 20, 200, 10))
+        self.api(None, "POST", '/api/brands', body={
+            'name': 'Marlboro',
+            'pack_quantity': 20,
+            'pack_price': 200,
+            'model_strength': 10
+        })
+
+        id_brand = self.last_result['id']
         self.api(None, 'POST', '/api/users/register',
                  body={
                      'id_tenant': ID_TENANT,
                      'username': 'user',
-                     'password': '123ABCa.'})
-
+                     'password': '123ABCa.',
+                     'brand_smoking': id_brand,
+                     'average_per_day': 15
+                 })
         self.assertEqual(200, self.last_code)
 
     def test_try_to_register_user_with_weak_password(self):
@@ -74,7 +91,8 @@ class TestRegistarUser(test_base_tornado):
                  body={
                      'id_tenant': ID_TENANT,
                      'username': 'user',
-                     'password': '123'})
+                     'password': '123',
+                 })
 
         self.assertEqual(400, self.last_code)
         self.assertIn('id_error', self.last_result)
