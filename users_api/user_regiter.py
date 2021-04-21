@@ -2,7 +2,6 @@ import re
 import uuid
 import users_models as models
 from tortoise.queryset import Q
-from datetime import datetime, timezone, timedelta
 import bcrypt
 import datetime
 
@@ -19,6 +18,7 @@ def is_valid_username(username):
             return False
 
     return True
+
 
 
 def password_strength(password, username=None):
@@ -87,7 +87,7 @@ def is_valid_password(password, username=None):
 
 
 async def register(id_tenant: uuid.UUID, username: str, password: str, id_brand_smoking, average_per_day: int,
-                   quit_date: datetime) -> dict:
+                   quit_date: datetime.date) -> dict:
     username = username.strip().lower()
 
     if not is_valid_username(username):

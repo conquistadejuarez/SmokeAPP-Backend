@@ -22,7 +22,7 @@ class User(Model):
     active = fields.BooleanField(null=False, default=True)
     average_per_day = fields.IntField(null=False)
     brand_smoking = fields.ForeignKeyField("models.CigarettesBrand", null=False, index=True, related_name='smokers')
-    quit_date = fields.DatetimeField(null=True)
+    quit_date = fields.DateField(null=True)
 
     def __str__(self):
         return 'Welcome back, ' + self.username

@@ -71,10 +71,44 @@ class test_is_valid_password(unittest.TestCase):
                          users_api.user_regiter.is_valid_password('ABCdefg1'))
 
 
+class test_milos(test_base):
+
+    def setUp(self):
+        super().setUp()
+        res = self.a(users_api.brands.add('Marlboro', 20, 200, 10))
+        self.id_brand = res['id']
+        self.username2id={}
+
+    def create_user_on_day(self, username, date_day):
+
+        with patch('users_api.today', return_value=date_day):
+            res = self.a(api.register(id_tenant, username, DEFAULT_PASSWORD, id_brand_smoking=self.id_brand, average_per_day=15,
+                                      quit_date=api.today()))
+            self.username2id[username] = res['id_user']
+
+    def test_devel(self):
+        self.flush_db_at_the_end = False
+
+        self.create_user_on_day('milos', datetime(2021, 3, 15).date())
+        self.create_user_on_day('igor', datetime(2020, 8, 24).date())
+
+        import tortoise.timezone
+
+        with patch('users_models.models.tz_now', return_value=tortoise.timezone.datetime(2021, 3, 18).date()):
+            self.assertEqual(3,self.a(users_api.days_since_user_quits(self.username2id['milos'])))
+
+        with patch('users_models.models.tz_now', return_value=tortoise.timezone.datetime(2021, 3, 20).date()):
+            self.assertEqual(5,self.a(users_api.days_since_user_quits(self.username2id['milos'])))
+
+        with patch('users_models.models.tz_now', return_value=tortoise.timezone.datetime(2021, 3, 20).date()):
+            self.assertEqual(208,self.a(users_api.days_since_user_quits(self.username2id['igor'])))
+
+
+
+
 class test_register_user(test_base):
 
     def test_register(self):
-        # self.flush_db_at_the_end=False
         res = self.a(users_api.brands.add('Marlboro', 20, 200, 10))
         id_brand = res['id']
 
@@ -85,7 +119,7 @@ class test_register_user(test_base):
         self.assertIn('status', res)
         self.assertEqual('ok', res['status'])
 
-        # self.flush_db_at_the_end = False
+        self.flush_db_at_the_end = False
 
     def test_try_register_user_with_existing_username_on_same_tenant(self):
         res = self.a(api.brands.add('Marlboro', 20, 200, 10))
