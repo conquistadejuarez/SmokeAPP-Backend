@@ -71,23 +71,23 @@ class test_is_valid_password(unittest.TestCase):
                          users_api.user_regiter.is_valid_password('ABCdefg1'))
 
 
-class test_milos(test_base):
+class test_model_methods(test_base):
 
     def setUp(self):
         super().setUp()
         res = self.a(users_api.brands.add('Marlboro', 20, 200, 10))
         self.id_brand = res['id']
-        self.username2id={}
+        self.username2id = {}
 
     def create_user_on_day(self, username, date_day):
-
         with patch('users_api.today', return_value=date_day):
-            res = self.a(api.register(id_tenant, username, DEFAULT_PASSWORD, id_brand_smoking=self.id_brand, average_per_day=15,
-                                      quit_date=api.today()))
+            res = self.a(
+                api.register(id_tenant, username, DEFAULT_PASSWORD, id_brand_smoking=self.id_brand, average_per_day=15,
+                             quit_date=api.today()))
             self.username2id[username] = res['id_user']
 
-    def test_devel(self):
-        self.flush_db_at_the_end = False
+    def test_days_since_user_quits(self):
+        # self.flush_db_at_the_end = False
 
         self.create_user_on_day('milos', datetime(2021, 3, 15).date())
         self.create_user_on_day('igor', datetime(2020, 8, 24).date())
@@ -95,15 +95,31 @@ class test_milos(test_base):
         import tortoise.timezone
 
         with patch('users_models.models.tz_now', return_value=tortoise.timezone.datetime(2021, 3, 18).date()):
-            self.assertEqual(3,self.a(users_api.days_since_user_quits(self.username2id['milos'])))
+            self.assertEqual(3, self.a(users_api.days_since_user_quits(self.username2id['milos'])))
 
         with patch('users_models.models.tz_now', return_value=tortoise.timezone.datetime(2021, 3, 20).date()):
-            self.assertEqual(5,self.a(users_api.days_since_user_quits(self.username2id['milos'])))
+            self.assertEqual(5, self.a(users_api.days_since_user_quits(self.username2id['milos'])))
 
         with patch('users_models.models.tz_now', return_value=tortoise.timezone.datetime(2021, 3, 20).date()):
-            self.assertEqual(208,self.a(users_api.days_since_user_quits(self.username2id['igor'])))
+            self.assertEqual(208, self.a(users_api.days_since_user_quits(self.username2id['igor'])))
 
+        # self.flush_db_at_the_end = False
 
+    def test_calc_money_spend_per_day(self):
+        self.create_user_on_day('dragan', datetime(2021, 3, 22).date())
+        self.assertEqual(150, self.a(users_api.calc_money_spend_per_day(self.username2id['dragan'])))
+
+    def test_how_much_money_user_saved(self):
+        self.create_user_on_day('pedja', datetime(2021, 4, 22))
+
+        with patch('users_models.models.tz_now', return_value=tortoise.timezone.datetime(2021, 4, 25).date()):
+            self.assertEqual(3 * 150, self.a(users_api.calc_money_not_spend(self.username2id['pedja'])))
+
+    def test_how_much_cigarettes_user_did_not_smoke(self):
+        self.create_user_on_day('igor', datetime(2021, 4, 22))
+
+        with patch('users_models.models.tz_now', return_value=tortoise.timezone.datetime(2021, 4, 25).date()):
+            self.assertEqual(3*15, self.a(users_api.calc_cigarettes_user_did_not_smoke(self.username2id['igor'])))
 
 
 class test_register_user(test_base):
@@ -119,7 +135,7 @@ class test_register_user(test_base):
         self.assertIn('status', res)
         self.assertEqual('ok', res['status'])
 
-        self.flush_db_at_the_end = False
+        #self.flush_db_at_the_end = False
 
     def test_try_register_user_with_existing_username_on_same_tenant(self):
         res = self.a(api.brands.add('Marlboro', 20, 200, 10))
