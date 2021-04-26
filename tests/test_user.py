@@ -103,7 +103,7 @@ class test_model_methods(test_base):
         with patch('users_models.models.tz_now', return_value=tortoise.timezone.datetime(2021, 3, 20).date()):
             self.assertEqual(208, self.a(users_api.days_since_user_quits(self.username2id['igor'])))
 
-        # self.flush_db_at_the_end = False
+        #self.flush_db_at_the_end = False
 
     def test_calc_money_spend_per_day(self):
         self.create_user_on_day('dragan', datetime(2021, 3, 22).date())
