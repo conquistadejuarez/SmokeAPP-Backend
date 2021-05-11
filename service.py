@@ -114,6 +114,23 @@ class brandsMethodHandler(tornado.web.RequestHandler):
         return
 
 
+class FHandler(tornado.web.RequestHandler):
+
+    async def get(self, command: str):
+        self.write(json.dumps(await brands_api.get_all()))
+
+        if command=='..':
+            pass
+        if command=='..':
+            pass
+        if command=='..':
+            pass
+
+        self.set_status(404)
+        self.write(json.dumps({'message': f'command {command} not exists'}, indent=4))
+        return
+
+
 class diseasesMethodHandler(tornado.web.RequestHandler):
 
     async def get(self):
@@ -147,6 +164,7 @@ def make_app():
         (r"/api/brands", brandsMethodHandler),
         (r"/api/brands/(.*)", singleBrandMethodHandler),
         (r"/api/diseases", diseasesMethodHandler),
+        (r"/api/f/(.*)", FHandler),
     ])
 
 

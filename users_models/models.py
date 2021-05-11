@@ -71,6 +71,8 @@ class Diseases(Model):
     disease_difficulty = fields.IntField()
     time_to_recover = fields.IntField()
 
+#TODO probaj da mokapujes promenljivu da je 1, i u testu uradi sleep (2) pa vidi da li je expireovalo
+default_expiration_period = 2*24*60*60
 
 class Session(Model):
     class Meta:
@@ -85,4 +87,4 @@ class Session(Model):
         super().__init__()
 
         self.user = user
-        self.expires_datetime = datetime.datetime.now() + datetime.timedelta(days=2)
+        self.expires_datetime = datetime.datetime.now() + datetime.timedelta(seconds=default_expiration_period)
