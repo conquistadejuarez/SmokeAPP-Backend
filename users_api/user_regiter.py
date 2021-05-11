@@ -20,7 +20,6 @@ def is_valid_username(username):
     return True
 
 
-
 def password_strength(password, username=None):
     result = []
     max_strength = 0

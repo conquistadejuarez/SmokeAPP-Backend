@@ -31,7 +31,7 @@ def seed_add_user(id_tenant, username, password, active, average_per_day, brand_
     return response
 
 
-def seed_add_brand(name, pack_price, pack_quantity, model_strength):
+def seed_add_brand(name, pack_quantity, pack_price, model_strength):
     url = base_url + "/api/brands"
 
     payload = json.dumps(
