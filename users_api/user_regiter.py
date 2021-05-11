@@ -152,7 +152,6 @@ async def login(id_tenant: uuid.UUID, username: str, password: str) -> dict:
             'expires_on': str(session.expires_datetime)[:19]
             }
 
-
 async def check(id_session: uuid.UUID):
     session = await models.Session.filter(id=id_session).get_or_none()
 
