@@ -4,7 +4,7 @@
 import tornado.ioloop
 import tornado.web
 import json
-
+import uuid
 import users_api as api
 import os
 
@@ -114,6 +114,86 @@ class brandsMethodHandler(tornado.web.RequestHandler):
         return
 
 
+class FHandler(tornado.web.RequestHandler):
+
+    async def get(self, command: str, id_user: str):
+
+        if not id_user:
+            return
+        print('stiglo je,', command, id_user)
+        try:
+            id_user = uuid.UUID(id_user)
+        except Exception as e:
+            print('greska,', e)
+        c = await api.days_since_user_quits(id_user)
+        self.write(str(c))
+        return
+
+
+class FHandler1(tornado.web.RequestHandler):
+
+    async def get(self, command: str, id_user: str):
+
+        if not id_user:
+            return
+        print('stiglo je,', command, id_user)
+        try:
+            id_user = uuid.UUID(id_user)
+        except Exception as e:
+            print('greska,', e)
+        b = await api.__str__(id_user)
+        self.write(str(b))
+        return
+
+
+class FHandler2(tornado.web.RequestHandler):
+
+    async def get(self, command: str, id_user: str):
+
+        if not id_user:
+            return
+        print('stiglo je,', command, id_user)
+        try:
+            id_user = uuid.UUID(id_user)
+        except Exception as e:
+            print('greska,', e)
+        a = await api.calc_cigarettes_user_did_not_smoke(id_user)
+        self.write(str(a))
+        return
+
+
+class FHandler3(tornado.web.RequestHandler):
+
+    async def get(self, command: str, id_user: str):
+
+        if not id_user:
+            return
+        print('stiglo je,', command, id_user)
+        try:
+            id_user = uuid.UUID(id_user)
+        except Exception as e:
+            print('greska,', e)
+        a = await api.calc_money_not_spend(id_user)
+        self.write(str(a))
+        return
+
+
+class FHandler4(tornado.web.RequestHandler):
+
+    async def get(self, command: str, id_user: str):
+
+        if not id_user:
+            return
+        print('stiglo je,', command, id_user)
+        try:
+            id_user = uuid.UUID(id_user)
+        except Exception as e:
+            print('greska,', e)
+        a = await api.calc_money_spend_per_day(id_user)
+        self.write(str(a))
+        return
+
+
 class diseasesMethodHandler(tornado.web.RequestHandler):
 
     async def get(self):
@@ -147,6 +227,11 @@ def make_app():
         (r"/api/brands", brandsMethodHandler),
         (r"/api/brands/(.*)", singleBrandMethodHandler),
         (r"/api/diseases", diseasesMethodHandler),
+        (r"/api/f/(.*)/(.*)", FHandler),
+        (r"/api/f1/(.*)/(.*)", FHandler1),
+        (r"/api/f2/(.*)/(.*)", FHandler2),
+        (r"/api/f3/(.*)/(.*)", FHandler3),
+        (r"/api/f4/(.*)/(.*)", FHandler4),
     ])
 
 

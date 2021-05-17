@@ -22,10 +22,10 @@ class User(Model):
     active = fields.BooleanField(null=False, default=True)
     average_per_day = fields.IntField(null=False)
     brand_smoking = fields.ForeignKeyField("models.CigarettesBrand", null=False, index=True, related_name='smokers')
-    quit_date = fields.DateField(null=True)
+    quit_date = fields.DatetimeField(null=True)
 
     def __str__(self):
-        return 'Welcome back, ' + self.username
+        return self.username
 
     @property
     def days_since_user_quits(self):
@@ -72,6 +72,10 @@ class Diseases(Model):
     time_to_recover = fields.IntField()
 
 
+# TODO probaj da mokapujes promenljivu da je 1, i u testu uradi sleep (2) pa vidi da li je expireovalo
+default_expiration_period = 2 * 24 * 60 * 60
+
+
 class Session(Model):
     class Meta:
         table = 'sessions'
@@ -85,4 +89,4 @@ class Session(Model):
         super().__init__()
 
         self.user = user
-        self.expires_datetime = datetime.datetime.now() + datetime.timedelta(days=2)
+        self.expires_datetime = datetime.datetime.now() + datetime.timedelta(seconds=default_expiration_period)

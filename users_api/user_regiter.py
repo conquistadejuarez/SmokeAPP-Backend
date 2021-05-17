@@ -4,6 +4,8 @@ import users_models as models
 from tortoise.queryset import Q
 import bcrypt
 import datetime
+import tortoise.timezone
+
 
 def is_valid_username(username):
     if len(username) < 2:
@@ -86,7 +88,7 @@ def is_valid_password(password, username=None):
 
 
 async def register(id_tenant: uuid.UUID, username: str, password: str, id_brand_smoking, average_per_day: int,
-                   quit_date: datetime.date) -> dict:
+                   quit_date: datetime.datetime) -> dict:
     username = username.strip().lower()
 
     if not is_valid_username(username):
@@ -152,6 +154,17 @@ async def login(id_tenant: uuid.UUID, username: str, password: str) -> dict:
             'expires_on': str(session.expires_datetime)[:19]
             }
 
+async def logout(id_session: uuid.UUID):
+    session = await models.Session.filter(id=id_session).get_or_none()
+
+    if not session:
+        return {'status': 'error', 'id_message': 'SESSION_NOT_FOUND_OR_EXPIRED',
+                'message': 'Session not found or expired'}
+
+    session.expires_datetime = tortoise.timezone.now()
+
+    return {'status': 'ok'}
+
 async def check(id_session: uuid.UUID):
     session = await models.Session.filter(id=id_session).get_or_none()
 
@@ -159,11 +172,14 @@ async def check(id_session: uuid.UUID):
         return {'status': 'error', 'id_message': 'SESSION_NOT_FOUND_OR_EXPIRED',
                 'message': 'Session not found or expired'}
 
-    import tortoise.timezone
 
     if session.expires_datetime < tortoise.timezone.make_aware(datetime.datetime.now()):
         return {'status': 'error', 'id_message': 'SESSION_NOT_FOUND_OR_EXPIRED',
                 'message': 'Session not found or expired'}
 
+    await session.fetch_related('user')
+
     return {'status': 'ok',
-            'id_user': str(session.user_id)}
+            'id_user': str(session.user_id),
+            'username': session.user.username
+            }

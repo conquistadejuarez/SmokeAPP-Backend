@@ -12,6 +12,14 @@ import uuid
 def today():
     return datetime.today()
 
+async def __str__(id_user: uuid.UUID):
+    user = await models.User.filter(id=id_user).get_or_none()
+
+    if not user:
+        return {'status': 'error', 'id_error': 'USER_NOT_FOUND'}
+
+    return user.__str__()
+
 
 async def days_since_user_quits(id_user: uuid.UUID):
     user = await models.User.filter(id=id_user).get_or_none()
