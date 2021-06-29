@@ -120,7 +120,7 @@ class FHandler(tornado.web.RequestHandler):
 
         if not id_user:
             return
-        print('stiglo je,', command, id_user)
+        #print('stiglo je,', command, id_user)
         try:
             id_user = uuid.UUID(id_user)
         except Exception as e:
@@ -136,7 +136,7 @@ class FHandler1(tornado.web.RequestHandler):
 
         if not id_user:
             return
-        print('stiglo je,', command, id_user)
+        #print('stiglo je,', command, id_user)
         try:
             id_user = uuid.UUID(id_user)
         except Exception as e:
@@ -152,7 +152,7 @@ class FHandler2(tornado.web.RequestHandler):
 
         if not id_user:
             return
-        print('stiglo je,', command, id_user)
+        #print('stiglo je,', command, id_user)
         try:
             id_user = uuid.UUID(id_user)
         except Exception as e:
@@ -168,7 +168,7 @@ class FHandler3(tornado.web.RequestHandler):
 
         if not id_user:
             return
-        print('stiglo je,', command, id_user)
+        #print('stiglo je,', command, id_user)
         try:
             id_user = uuid.UUID(id_user)
         except Exception as e:
@@ -184,7 +184,7 @@ class FHandler4(tornado.web.RequestHandler):
 
         if not id_user:
             return
-        print('stiglo je,', command, id_user)
+        #print('stiglo je,', command, id_user)
         try:
             id_user = uuid.UUID(id_user)
         except Exception as e:
